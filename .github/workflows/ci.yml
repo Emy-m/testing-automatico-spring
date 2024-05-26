@@ -1,13 +1,16 @@
 name: Java CI for Integration Test
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
   steps:
-    - name: Checkout repository
+    - name: Check out code
       uses: actions/checkout@v2
 
     - name: Set up JDK 11
