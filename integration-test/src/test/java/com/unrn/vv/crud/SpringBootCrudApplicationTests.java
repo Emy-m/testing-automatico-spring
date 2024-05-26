@@ -32,6 +32,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (1,'CAR', 1, 334000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (2,'shoes', 1, 999)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (4,'CAR', 1, 34000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (8,'books', 5, 1499)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class SpringBootCrudApplicationTests {
 
     @LocalServerPort
@@ -65,7 +69,7 @@ class SpringBootCrudApplicationTests {
         Product product = new Product("headset", 2, 7999);
         Product response = restTemplate.postForObject(baseUrl, product, Product.class);
         assertEquals("headset", response.getName());
-        assertEquals(1, h2Repository.findAll().size());
+        assertEquals(5, h2Repository.findAll().size());
     }
 
     @Test
@@ -81,23 +85,20 @@ class SpringBootCrudApplicationTests {
          
         assertNotNull(prod);
         assertEquals("headset", prod.getName());
-        assertEquals(1, h2Repository.findAll().size());
+        assertEquals(5, h2Repository.findAll().size());
     }
 
 
     @Test
-    @Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (4,'CAR', 1, 34000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testGetProducts() {     
 
         List<Product> products = restTemplate.getForObject(baseUrl, List.class);
-        assertEquals(1, products.size());
-        assertEquals(1, h2Repository.findAll().size());
+        assertEquals(5, products.size());
+        assertEquals(5, h2Repository.findAll().size());
     }
 
 
     @Test
-    @Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (1,'CAR', 1, 334000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(statements = "DELETE FROM products WHERE id=1", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void testFindProductById() {
         Product product = restTemplate.getForObject(baseUrl + "/{id}", Product.class, 1);
         assertAll(
@@ -109,8 +110,6 @@ class SpringBootCrudApplicationTests {
     }
 
     @Test
-    @Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (2,'shoes', 1, 999)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(statements = "DELETE FROM products WHERE id=1", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void testUpdateProduct(){
         Product product = new Product("shoes", 1, 1999);
         restTemplate.put(baseUrl+"/update/{id}", product, 2);
@@ -125,12 +124,11 @@ class SpringBootCrudApplicationTests {
     }
 
     @Test
-    @Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (8,'books', 5, 1499)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testDeleteProduct(){
         int recordCount=h2Repository.findAll().size();
-        assertEquals(1, recordCount);
+        assertEquals(5, recordCount);
         restTemplate.delete(baseUrl+"/{id}", 8);
-        assertEquals(0, h2Repository.findAll().size());
+        assertEquals(4, h2Repository.findAll().size());
 
     }
 
