@@ -4,27 +4,18 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.elasticsearch.RestClientBuilderCustomizer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
 import com.unrn.vv.crud.entity.Product;
-
-import ch.qos.logback.core.util.Duration;
 
 import java.util.List;
 
@@ -32,10 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (1,'CAR', 1, 334000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (2,'shoes', 1, 999)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (4,'CAR', 1, 34000)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-@Sql(statements = "INSERT INTO products (id,name, quantity, price) VALUES (8,'books', 5, 1499)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class SpringBootCrudApplicationTests {
 
     @LocalServerPort
@@ -52,6 +39,9 @@ class SpringBootCrudApplicationTests {
     @Autowired
     private MockMvc mvc;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @BeforeAll
     public static void init() {   
 
@@ -62,6 +52,11 @@ class SpringBootCrudApplicationTests {
     @BeforeEach
     public void setUp() {
         baseUrl = baseUrl.concat(":").concat(port + "").concat("/products");
+
+        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (1,'CAR', 1, 334000)");
+        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (2,'shoes', 1, 999)");
+        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (4,'CAR', 1, 34000)");
+        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (8,'books', 5, 1499)");
     }
 
     @Test
