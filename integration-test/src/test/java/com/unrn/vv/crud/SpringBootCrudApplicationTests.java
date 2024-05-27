@@ -11,7 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,35 +39,27 @@ class SpringBootCrudApplicationTests {
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
     @BeforeAll
-    public static void init() {   
-
+    public static void init() {
         restTemplate = new RestTemplate();
-     
     }
 
     @BeforeEach
     public void setUp() {
         baseUrl = baseUrl.concat(":").concat(port + "").concat("/products");
-
-        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (1,'CAR', 1, 334000)");
-        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (2,'shoes', 1, 999)");
-        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (4,'CAR', 1, 34000)");
-        jdbcTemplate.execute("INSERT INTO products (id,name, quantity, price) VALUES (8,'books', 5, 1499)");
     }
 
     @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testAddProduct() {
         Product product = new Product("headset", 2, 7999);
         Product response = restTemplate.postForObject(baseUrl, product, Product.class);
         assertEquals("headset", response.getName());
-        assertEquals(5, h2Repository.findAll().size());
+        assertEquals(1, h2Repository.findAll().size());
     }
 
     @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     public void testAddProduct2() {
        
         HttpEntity<Product> request = new HttpEntity<>(new Product("headset", 2, 7999));
@@ -80,31 +72,37 @@ class SpringBootCrudApplicationTests {
          
         assertNotNull(prod);
         assertEquals("headset", prod.getName());
-        assertEquals(5, h2Repository.findAll().size());
+        assertEquals(1, h2Repository.findAll().size());
     }
 
 
     @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (3, 'CAR', 1, 1000)")
     public void testGetProducts() {     
 
         List<Product> products = restTemplate.getForObject(baseUrl, List.class);
-        assertEquals(5, products.size());
-        assertEquals(5, h2Repository.findAll().size());
+        assertEquals(1, products.size());
+        assertEquals(1, h2Repository.findAll().size());
     }
 
 
     @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (4, 'CAR', 1, 1500)")
     public void testFindProductById() {
-        Product product = restTemplate.getForObject(baseUrl + "/{id}", Product.class, 1);
+        Product product = restTemplate.getForObject(baseUrl + "/{id}", Product.class, 4);
         assertAll(
                 () -> assertNotNull(product),
-                () -> assertEquals(1, product.getId()),
+                () -> assertEquals(4, product.getId()),
                 () -> assertEquals("CAR", product.getName())
         );
 
     }
 
     @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (2, 'shoes', 1, 999)")
     public void testUpdateProduct(){
         Product product = new Product("shoes", 1, 1999);
         restTemplate.put(baseUrl+"/update/{id}", product, 2);
@@ -113,19 +111,17 @@ class SpringBootCrudApplicationTests {
                 () -> assertNotNull(productFromDB),
                 () -> assertEquals(1999, productFromDB.getPrice())
         );
-
-
-
     }
 
     @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (9, 'tshirt', 1, 200)")
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (8, 'shoes', 1, 999)")
     public void testDeleteProduct(){
         int recordCount=h2Repository.findAll().size();
-        assertEquals(5, recordCount);
+        assertEquals(2, recordCount);
         restTemplate.delete(baseUrl+"/{id}", 8);
-        assertEquals(4, h2Repository.findAll().size());
+        assertEquals(1, h2Repository.findAll().size());
 
     }
-
-
 }
