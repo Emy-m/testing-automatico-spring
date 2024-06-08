@@ -1,5 +1,6 @@
 package com.unrn.vv.crud;
 
+import com.unrn.vv.crud.entity.Provider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,5 +124,31 @@ class SpringBootCrudApplicationTests {
         restTemplate.delete(baseUrl+"/{id}", 8);
         assertEquals(1, h2Repository.findAll().size());
 
+    }
+
+    @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (9, 'tshirt', 1, 200)")
+    @Sql(statements = "INSERT INTO providers (id, name, phone, street) VALUES (1, 'Emilio', '2920112233', 'Calle falsa 111')")
+    public void testSetProviderForProduct() {
+        Product product = h2Repository.findById(9).get();
+        assertNull(product.getProvider());
+
+        restTemplate.put(baseUrl + "/{id}/provider/{providerId}", null, 9, 1);
+        Product afterProduct = h2Repository.findById(9).get();
+        assertNotNull(afterProduct.getProvider());
+        assertEquals("Emilio", afterProduct.getProvider().getName());
+    }
+
+    @Test
+    @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM providers", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (9, 'tshirt', 1, 200)")
+    @Sql(statements = "INSERT INTO providers (id, name, phone, street) VALUES (1, 'Emilio', '2920112233', 'Calle falsa 111')")
+    public void testGetProviderForProduct() {
+        restTemplate.put(baseUrl + "/{id}/provider/{providerId}", null, 9, 1);
+        Provider provider = restTemplate.getForObject(baseUrl + "/{id}/provider", Provider.class, 9);
+        assertNotNull(provider);
+        assertEquals("Emilio", provider.getName());
     }
 }

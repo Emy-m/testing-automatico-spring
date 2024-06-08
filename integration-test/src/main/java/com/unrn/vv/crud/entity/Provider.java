@@ -25,4 +25,10 @@ public class Provider {
     private String phone;
     private String street;
 
+    public Provider(String name, String phone, String street) {
+        this.name = name;
+        this.phone = phone;
+        this.street = street;
+    }
+
 }

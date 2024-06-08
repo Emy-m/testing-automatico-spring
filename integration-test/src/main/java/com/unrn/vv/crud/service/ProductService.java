@@ -1,5 +1,7 @@
 package com.unrn.vv.crud.service;
 
+import com.unrn.vv.crud.entity.Provider;
+import com.unrn.vv.crud.repository.ProviderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -7,11 +9,15 @@ import com.unrn.vv.crud.entity.Product;
 import com.unrn.vv.crud.repository.ProductRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
     @Autowired
     private ProductRepository repository;
+
+    @Autowired
+    private ProviderRepository providerRepository;
 
     public Product saveProduct(Product product) {
         return repository.save(product);
@@ -46,5 +52,30 @@ public class ProductService {
         return repository.save(existingProduct);
     }
 
+    public List<Product> getProductsByProvider(int providerId) {
+        Provider provider = providerRepository.findById(providerId).orElseThrow(
+            () -> new RuntimeException("Provider not found with id: " + providerId)
+        );
+        return repository.findByProvider(provider);
+    }
 
+    public Product assignProvider(int productId, int providerId) {
+        Product product = repository.findById(productId).orElseThrow(
+            () -> new RuntimeException("Product not found with id: " + productId)
+        );
+
+        Provider provider = providerRepository.findById(providerId).orElseThrow(
+            () -> new RuntimeException("Provider not found with id: " + providerId)
+        );
+
+        product.setProvider(provider);
+
+        return repository.save(product);
+    }
+
+    public Provider getProvider(int productId) {
+        Product product = repository.findById(productId).
+                orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        return product.getProvider();
+    }
 }

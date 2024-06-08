@@ -1,5 +1,6 @@
 package com.unrn.vv.crud.controller;
 
+import com.unrn.vv.crud.entity.Provider;
 import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,15 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable int id) {
         return service.deleteProduct(id);
+    }
+
+    @GetMapping("/{id}/provider")
+    public Provider getProductProvider(@PathVariable int id) {
+        return service.getProvider(id);
+    }
+
+    @PutMapping("{id}/provider/{providerId}")
+    public Product addProviderToProduct(@PathVariable int id, @PathVariable int providerId) {
+        return service.assignProvider(id, providerId);
     }
 }
