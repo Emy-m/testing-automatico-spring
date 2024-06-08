@@ -128,6 +128,7 @@ class SpringBootCrudApplicationTests {
 
     @Test
     @Sql(statements = "DELETE FROM products", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM providers", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(statements = "INSERT INTO products (id, name, quantity, price) VALUES (9, 'tshirt', 1, 200)")
     @Sql(statements = "INSERT INTO providers (id, name, phone, street) VALUES (1, 'Emilio', '2920112233', 'Calle falsa 111')")
     public void testSetProviderForProduct() {
