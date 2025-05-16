@@ -34,7 +34,7 @@ public class SaleController {
 
     @PutMapping("/cancel/{id}")
     public Sale cancelSale(@PathVariable int id) {
-        return service.updateStateSale(id, SaleStatus.CANCELED);
+        return service.updateStateSale(id, SaleStatus.CANCELLED);
     }
 
     @PutMapping("/pay/{id}")

@@ -64,7 +64,7 @@ public class SaleTests {
         restTemplate.put(baseUrl + "/cancel/{id}", null, 1);
         Sale response = restTemplate.getForObject(baseUrl + "/{id}", Sale.class, 1);
         assertNotNull(response);
-        assertEquals(SaleStatus.CANCELED, response.getState());
+        assertEquals(SaleStatus.CANCELLED, response.getState());
     }
 
     @Test

@@ -1,18 +1,13 @@
 package com.unrn.vv.crud.controller;
 
 import com.unrn.vv.crud.entity.Provider;
-import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.unrn.vv.crud.entity.Product;
 import com.unrn.vv.crud.service.ProductService;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;

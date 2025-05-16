@@ -64,6 +64,11 @@ public class ProductService {
             () -> new RuntimeException("Product not found with id: " + productId)
         );
 
+        if (product.getProvider() != null) {
+            throw new IllegalStateException("El producto ya tiene un proveedor asignado");
+        }
+
+
         Provider provider = providerRepository.findById(providerId).orElseThrow(
             () -> new RuntimeException("Provider not found with id: " + providerId)
         );

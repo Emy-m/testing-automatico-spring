@@ -4,7 +4,7 @@ public enum SaleStatus {
     PENDING,
     PAID,
     FINALIZED,
-    CANCELED;
+    CANCELLED;
 
     public static boolean isValidStatus(String status) {
         for (SaleStatus value : values()) {
